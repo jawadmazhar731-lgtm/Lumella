@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="color-scheme" content="dark"/>
+<link rel="icon" href="data:,"/>
+<title>Lumelle Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+:root{
+  --bg:#161513; --bg2:#191714; --sidebar:#12110f; --card:#1c1a18; --card2:#262421; --line:rgba(255,255,255,.08);
+  --text:#efe9de; --muted:#aaa398; --muted2:#8a847a;
+  --gold:#e8c07a;
+  --green:#7fbf8a; --red:#e08b7d;
+  --radius:14px;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Manrope",system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#33302b;border-radius:99px}
+
+/* LAYOUT */
+.app{display:flex;min-height:100vh}
+/* SIDEBAR */
+.sidebar{width:248px;flex:0 0 248px;background:var(--sidebar);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:22px 14px 16px;z-index:20}
+.logo{display:flex;align-items:center;gap:12px;padding:2px 10px 16px}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:var(--gold);display:grid;place-items:center;font-weight:500;font-size:19px;color:#171207;flex:0 0 36px}
+.logo b{font-size:20px;letter-spacing:0;font-weight:500;line-height:1}
+.logo span{display:block;font-family:"Manrope";font-size:11.5px;color:var(--muted);margin-top:3px;font-weight:400}
+.nav-label{font-size:12.5px;color:var(--muted2);font-weight:500;padding:20px 12px 8px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px}
+.nav-pill{position:absolute;left:0;right:0;height:36px;background:#1e1c19;border:1px solid var(--line);border-radius:9px;top:0;pointer-events:none;box-shadow:inset 2px 0 0 var(--gold)}
+.nav a{position:relative;z-index:1;display:flex;align-items:center;gap:11px;height:36px;padding:0 12px;border-radius:9px;color:var(--muted);font-size:13.5px;font-weight:500;transition:color .2s var(--ease),background-color .2s var(--ease)}
+.nav a.active{color:var(--text)}
+.nav a svg{width:18px;height:18px;flex:0 0 18px;opacity:.9}
+.nav a .count{margin-left:auto;font-family:ui-monospace,monospace;font-size:12px;color:var(--muted2)}
+.nav a .dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--muted2)}
+.side-card{margin-top:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.side-card b{font-size:13px;font-weight:500} .side-card p{margin:6px 0 12px;font-size:12px;line-height:1.5;color:var(--muted)}
+.btn-light{background:var(--text);color:#17140f;border:0;border-radius:8px;padding:9px 12px;font-weight:500;font-size:12.5px;width:100%;transition:background-color .2s var(--ease)}
+.btn-light:hover{background:#fff}
+.user-row{display:flex;align-items:center;gap:10px;padding:14px 6px 2px;border-top:1px solid var(--line);margin-top:14px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--card2);display:grid;place-items:center;font-weight:500;font-size:13px;color:var(--muted);flex:0 0 36px}
+.user-row b{font-size:13px;display:block} .user-row span{font-size:11.5px;color:var(--muted)}
+.user-row button{margin-left:auto;background:none;border:0;color:var(--muted);font-size:18px}
+
+/* MAIN */
+.main{flex:1;min-width:0;background:var(--bg)}
+.topbar{position:sticky;top:0;z-index:15;background:var(--bg);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:14px 28px}
+.search{flex:1;max-width:460px;display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 13px;height:40px;color:var(--muted)}
+.search svg{flex:0 0 16px}
+.search input{flex:1;background:none;border:0;outline:0;color:var(--text);font-size:13.5px;font-family:inherit}
+.search input::placeholder{color:var(--muted2)}
+.search kbd{font-size:10px;border:1px solid var(--line);border-radius:5px;padding:2px 5px;color:var(--muted)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.icon-btn{width:40px;height:40px;border-radius:10px;background:var(--card);border:1px solid var(--line);color:var(--muted);display:grid;place-items:center;position:relative;transition:color .2s var(--ease),background-color .2s var(--ease),border-color .2s var(--ease)}
+.icon-btn:hover{color:var(--text);background:var(--card2)}
+.icon-btn i{position:absolute;top:9px;right:10px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--card)}
+.btn-primary{background:var(--text);color:#17140f;border:0;border-radius:10px;height:40px;padding:0 16px;font-weight:500;font-size:13px;transition:background-color .2s var(--ease)}
+.btn-primary:hover{background:#fff}
+.text-btn{background:none;border:0;color:var(--muted);font-size:12px;font-weight:500;font-family:ui-monospace,monospace;padding:4px 0;transition:color .2s var(--ease)}
+.text-btn:hover{color:var(--text)}
+.content{padding:28px;max-width:1240px;margin:0 auto}
+.view{display:none} .view.active{display:block;animation:fade .45s var(--ease)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.greet-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+.greet-row h1{font-size:30px;line-height:1.1;margin:0;font-weight:500;letter-spacing:-.01em}
+.greet-row p{margin:8px 0 0;color:var(--muted);font-size:13.5px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{background:none;border:0;color:var(--muted);padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:500;transition:color .2s var(--ease),background-color .2s var(--ease)}
+.seg button.on{background:var(--card2);color:var(--text)}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column}
+.kpi label{font-size:12.5px;color:var(--muted);font-weight:500}
+.kpi .val{font-size:30px;font-weight:500;letter-spacing:-.02em;margin:10px 0 4px}
+.kpi.hero .val{font-size:32px;color:var(--gold)}
+.kpi small{font-size:12px;color:var(--muted);margin-top:auto}
+.up{color:var(--green);font-weight:500} .down{color:var(--red);font-weight:500}
+
+/* CARDS / GRID */
+.grid-2{display:grid;grid-template-columns:1.9fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px}
+.card-head h3{margin:0;font-size:15px} .card-head p{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);font-weight:500;margin-top:10px}
+.legend i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.chart-wrap{width:100%;overflow:hidden}
+.chart-wrap svg{width:100%;height:auto;display:block}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted2);padding:6px 2px 0;font-family:ui-monospace,monospace}
+.list-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.list-row:last-child{border-bottom:0}
+.thumb{width:38px;height:38px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:500;flex:0 0 38px;background:var(--card2);color:var(--muted)}
+.list-row b{font-size:13px;display:block} .list-row span{font-size:12px;color:var(--muted)}
+.list-row .r{margin-left:auto;text-align:right}
+.pill{font-size:11px;font-weight:500;padding:4px 9px;border-radius:99px}
+.pill.green{background:rgba(127,191,138,.13);color:#a5d3ac}.pill.amber{background:rgba(232,192,122,.13);color:#e8c07a}.pill.red{background:rgba(224,139,125,.13);color:#edafa2}.pill.blue{background:rgba(170,163,152,.14);color:#c9c2b4}.pill.violet{background:rgba(170,163,152,.14);color:#c9c2b4}
+.progress{height:6px;background:#2b2823;border-radius:99px;overflow:hidden;margin-top:7px}
+.progress i{display:block;height:100%;border-radius:99px;background:#6b665e}
+.progress i.gold{background:var(--gold)}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:680px;background:var(--card)}
+th{ text-align:left;font-size:12px;color:var(--muted);padding:13px 16px;border-bottom:1px solid var(--line);background:#171512;font-weight:500}
+td{padding:13px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.045);vertical-align:middle}
+tr:last-child td{border-bottom:0} tbody tr:hover{background:rgba(255,255,255,.02)}
+.prod-cell{display:flex;align-items:center;gap:11px;font-weight:500}
+.mono{font-family:ui-monospace,monospace;font-size:12px;color:var(--muted)}
+
+/* PRODUCTS */
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:background-color .2s var(--ease),border-color .2s var(--ease);text-align:left;color:var(--text);width:100%}
+.cat:hover{border-color:rgba(255,255,255,.16);background:var(--card2)}
+.cat .tile{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-weight:500;font-size:14px;margin-bottom:12px;background:var(--card2);color:var(--muted)}
+.cat b{font-size:13px;display:block;line-height:1.3;font-weight:500} .cat span{font-size:12px;color:var(--muted)}
+.cat .cnt{margin-top:10px;font-size:11.5px;font-weight:500;color:var(--muted);font-family:ui-monospace,monospace}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:18px 0 12px}
+.toolbar h2{margin:0;font-size:18px}
+.view-toggle{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.view-toggle button{border:0;background:none;color:var(--muted);padding:7px 12px;border-radius:7px;font-weight:500;font-size:12.5px}
+.view-toggle button.on{background:var(--card2);color:var(--text)}
+
+/* ANALYTICS */
+.bars .bar-row{margin-bottom:16px} .bars .bar-row:last-child{margin-bottom:0}
+.bar-top{display:flex;justify-content:space-between;font-size:12.5px;font-weight:500;margin-bottom:7px} .bar-top span{color:var(--muted);font-weight:500}
+.notice{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:14px}
+.notice b{color:var(--text);font-weight:500}
+.mobile-nav{display:none}
+footer.note{max-width:1240px;margin:0 auto;padding:0 28px 28px;color:var(--muted2);font-size:11.5px}
+
+@media(max-width:1020px){.kpis{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){
+  .sidebar{display:none}
+  .topbar{padding:12px 16px}.content{padding:20px 16px 92px}
+  .search kbd{display:none}.btn-primary{display:none}#topLoginBtn{display:none}
+  .greet-row h1{font-size:27px}.cat-grid{grid-template-columns:1fr 1fr}
+  .mobile-nav{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:30;background:rgba(18,17,15,.96);border:1px solid var(--line);border-radius:14px;padding:8px;justify-content:space-around}
+  .mobile-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:500;color:var(--muted);padding:6px 10px;border-radius:8px}
+  .mobile-nav a.active{color:var(--text);background:var(--card2)}
+  .mobile-nav svg{width:19px;height:19px}
+}
+/* AUTH */
+.auth-screen{min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:28px 18px}
+.auth-screen[hidden]{display:none}
+.auth-shell{width:100%;max-width:1060px;display:grid;grid-template-columns:1.05fr .95fr;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.auth-brand{padding:38px 36px;background:var(--sidebar);border-right:1px solid var(--line);display:flex;flex-direction:column}
+.auth-brand .logo{padding:0 0 28px}
+.auth-brand h2{font-size:32px;line-height:1.12;margin:0;font-weight:500;letter-spacing:-.01em}
+.auth-brand>p{color:var(--muted);font-size:14px;line-height:1.65;margin:14px 0 0;max-width:38ch}
+.auth-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:28px 0}
+.auth-stat{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:14px}
+.auth-stat b{font-size:20px;display:block;font-weight:500}.auth-stat span{font-size:11.5px;color:var(--muted)}
+.auth-perks{list-style:none;margin:0;padding:0;display:grid;gap:11px;font-size:13px;color:var(--muted)}
+.auth-perks li{display:flex;gap:10px;align-items:flex-start;line-height:1.45}
+.auth-perks li::before{content:"✓";width:20px;height:20px;flex:0 0 20px;border-radius:50%;background:var(--card2);color:var(--muted);display:grid;place-items:center;font-size:11px;font-weight:500;margin-top:1px}
+.auth-quote{margin-top:auto;padding-top:28px;border-top:1px solid var(--line);display:flex;gap:12px;align-items:center}
+.auth-quote b{font-size:13px;display:block}.auth-quote span{font-size:12px;color:var(--muted)}
+.auth-panel{padding:34px 34px 28px;background:var(--bg2)}
+.auth-back{background:none;border:0;color:var(--muted);font-size:12.5px;font-weight:500;padding:0;margin-bottom:18px;transition:color .2s var(--ease)}
+.auth-back:hover{color:var(--text)}
+.auth-tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px;gap:4px;margin-bottom:22px}
+.auth-tabs button{flex:1;border:0;background:none;color:var(--muted);padding:10px;border-radius:8px;font-weight:500;font-size:13.5px;transition:color .2s var(--ease),background-color .2s var(--ease)}
+.auth-tabs button.on{background:var(--card2);color:var(--text)}
+.auth-panel h1{font-size:28px;margin:0;font-weight:500;letter-spacing:-.01em}
+.auth-panel .sub{color:var(--muted);font-size:13.5px;line-height:1.55;margin:8px 0 22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12.5px;font-weight:500;margin-bottom:7px}
+.field-wrap{display:flex;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 12px;height:48px;gap:9px;color:var(--muted);transition:border-color .2s var(--ease)}
+.field-wrap svg{flex:0 0 16px}
+.field-wrap:focus-within{border-color:rgba(239,233,222,.45)}
+.field-wrap input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font-size:14px;font-family:inherit;height:100%}
+.field-wrap input::placeholder{color:var(--muted2)}
+.eye-btn{background:none;border:0;color:var(--muted);font-size:12px;font-weight:500;padding:6px 2px;white-space:nowrap}
+.field-err{display:none;color:#f0b3a6;font-size:12px;margin-top:6px;font-weight:500}
+.field.invalid .field-wrap{border-color:rgba(248,113,113,.6)}
+.field.invalid .field-err{display:block}
+.field-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:2px 0 16px;font-size:12.5px}
+.field-row a{color:var(--text);font-weight:500}
+.strength{height:6px;background:#2b2823;border-radius:99px;overflow:hidden;margin-top:8px}
+.strength i{display:block;height:100%;width:0;background:var(--red);border-radius:99px;transition:width .25s var(--ease),background-color .25s var(--ease)}
+.strength-txt{font-size:11.5px;color:var(--muted);margin-top:6px;display:block}
+.btn-auth{width:100%;height:48px;border:0;border-radius:10px;background:var(--gold);color:#171106;font-weight:500;font-size:14px;transition:background-color .2s var(--ease)}
+.btn-auth:hover{background:#f0cd8a}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted2);font-size:11.5px;font-weight:500;margin:20px 0 14px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.social-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-social{height:44px;border-radius:10px;background:var(--card);border:1px solid var(--line);color:var(--text);font-weight:500;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color .2s var(--ease),background-color .2s var(--ease)}
+.btn-social:hover{border-color:rgba(255,255,255,.2);background:var(--card2)}
+.auth-switch{ text-align:center;color:var(--muted);font-size:13px;margin:20px 0 0}
+.auth-switch button{background:none;border:0;color:var(--text);font-weight:500;font-size:13px;padding:0}
+.auth-note{font-size:11.5px;color:var(--muted2);line-height:1.55;text-align:center;margin:14px 0 0}
+.auth-msg{display:none;border-radius:11px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:16px}
+.auth-msg.ok{display:block;background:rgba(127,191,138,.10);border:1px solid rgba(127,191,138,.3);color:#bfe3c6}
+.auth-msg.err{display:block;background:rgba(224,139,125,.10);border:1px solid rgba(224,139,125,.3);color:#f3cdc4}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--card2);border:1px solid var(--line);color:var(--text);padding:13px 18px;border-radius:10px;font-size:13.5px;font-weight:500;z-index:60;opacity:0;pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease);max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:820px){.auth-shell{grid-template-columns:1fr}.auth-brand{display:none}.auth-panel{padding:26px 20px 22px}.auth-screen{padding:14px 12px;align-items:flex-start}.social-row{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH: LOGIN / SIGN UP ============ -->
+<div class="auth-screen" id="authScreen" hidden>
+  <div class="auth-shell">
+    <aside class="auth-brand">
+      <div class="logo"><div class="logo-mark">L</div><div><b>Lumelle</b><span>Store admin</span></div></div>
+      <h2>Your store,<br>beautifully under control.</h2>
+      <p>Sign in to track revenue, manage products and orders, and see exactly how Lumelle is performing today.</p>
+      <div class="auth-stats">
+        <div class="auth-stat"><b>$280,257</b><span>Revenue this year</span></div>
+        <div class="auth-stat"><b>8,429</b><span>Orders processed</span></div>
+        <div class="auth-stat"><b>3,214</b><span>Happy customers</span></div>
+        <div class="auth-stat"><b>42%</b><span>Returning buyers</span></div>
+      </div>
+      <ul class="auth-perks">
+        <li>Real-time revenue, orders &amp; visitor analytics</li>
+        <li>Product, stock and category management in one place</li>
+        <li>Customer insights and sales-by-channel breakdowns</li>
+      </ul>
+      <div class="auth-quote"><div class="avatar">N</div><div><b>Noor Fatima</b><span>Store Owner, Lumelle — Karachi</span></div></div>
+    </aside>
+
+    <div class="auth-panel">
+      <button class="auth-back" id="authBack">← Back to dashboard</button>
+      <div class="auth-tabs" role="tablist">
+        <button class="on" id="tabLogin" type="button">Log In</button>
+        <button id="tabSignup" type="button">Sign Up</button>
+      </div>
+
+      <div class="auth-msg" id="authMsg" role="status"></div>
+
+      <!-- LOGIN -->
+      <form id="loginForm" novalidate>
+        <h1>Welcome back</h1>
+        <p class="sub">Log in to your Lumelle account to open your dashboard.</p>
+        <div class="field" id="liEmailField">
+          <label for="liEmail">Email address</label>
+          <div class="field-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input id="liEmail" type="email" autocomplete="email" placeholder="you@lumelle.store" value="noor@lumelle.store"></div>
+          <span class="field-err">Enter a valid email address.</span>
+        </div>
+        <div class="field" id="liPassField">
+          <label for="liPass">Password</label>
+          <div class="field-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input id="liPass" type="password" autocomplete="current-password" placeholder="Enter your password"><button type="button" class="eye-btn" data-eye="liPass">Show</button></div>
+          <span class="field-err">Password must be at least 6 characters.</span>
+        </div>
+        <div class="field-row"><span style="color:var(--muted)">Demo: any password of 6+ characters works.</span><a href="#" id="forgotLink">Forgot password?</a></div>
+        <button class="btn-auth" type="submit">Log In to Dashboard →</button>
+        <div class="divider">or continue with</div>
+        <div class="social-row">
+          <button type="button" class="btn-social" data-social="Google"><span style="font-weight:500">G</span> Google</button>
+          <button type="button" class="btn-social" data-social="Apple"><span aria-hidden="true"></span> Apple</button>
+        </div>
+        <p class="auth-switch">New to Lumelle? <button type="button" data-goto-signup>Create an account</button></p>
+      </form>
+
+      <!-- SIGN UP -->
+      <form id="signupForm" novalidate hidden>
+        <h1>Create your account</h1>
+        <p class="sub">Start selling with Lumelle — set up your store in under a minute.</p>
+        <div class="field" id="suNameField">
+          <label for="suName">Full name</label>
+          <div class="field-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input id="suName" type="text" autocomplete="name" placeholder="e.g. Noor Fatima"></div>
+          <span class="field-err">Please enter your full name.</span>
+        </div>
+        <div class="field">
+          <label for="suStore">Store name <span style="color:var(--muted);font-weight:500">(optional)</span></label>
+          <div class="field-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><input id="suStore" type="text" autocomplete="organization" placeholder="e.g. Lumelle"></div>
+        </div>
+        <div class="field" id="suEmailField">
+          <label for="suEmail">Email address</label>
+          <div class="field-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input id="suEmail" type="email" autocomplete="email" placeholder="you@lumelle.store"></div>
+          <span class="field-err">Enter a valid email address.</span>
+        </div>
+        <div class="field" id="suPassField">
+          <label for="suPass">Create password</label>
+          <div class="field-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input id="suPass" type="password" autocomplete="new-password" placeholder="At least 8 characters"><button type="button" class="eye-btn" data-eye="suPass">Show</button></div>
+          <div class="strength"><i id="strengthBar"></i></div>
+          <span class="strength-txt" id="strengthTxt">Use 8+ characters with a mix of letters and numbers.</span>
+          <span class="field-err">Password must be at least 8 characters.</span>
+        </div>
+        <div class="field" id="suConfirmField">
+          <label for="suConfirm">Confirm password</label>
+          <div class="field-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input id="suConfirm" type="password" autocomplete="new-password" placeholder="Repeat your password"><button type="button" class="eye-btn" data-eye="suConfirm">Show</button></div>
+          <span class="field-err">Passwords do not match.</span>
+        </div>
+        <button class="btn-auth" type="submit">Create Account →</button>
+        <div class="divider">or sign up with</div>
+        <div class="social-row">
+          <button type="button" class="btn-social" data-social="Google"><span style="font-weight:500">G</span> Google</button>
+          <button type="button" class="btn-social" data-social="Apple"><span aria-hidden="true"></span> Apple</button>
+        </div>
+        <p class="auth-switch">Already have an account? <button type="button" data-goto-login>Log in</button></p>
+        <p class="auth-note">By creating an account you agree to Lumelle's Terms of Service and Privacy Policy.</p>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<div class="app" id="appShell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-mark">L</div><div><b>Lumelle</b><span>Store admin</span></div></div>
+    <div class="nav-label">Menu</div>
+    <nav class="nav" id="sideNav">
+      <div class="nav-pill" id="navPill"></div>
+      <a href="#" class="active" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</a>
+      <a href="#" data-view="products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Products<span class="count">23</span></a>
+      <a href="#" data-view="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>Orders<span class="dot"></span></a>
+      <a href="#" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>Analytics</a>
+      <a href="#" data-view="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Customers</a>
+    </nav>
+    <div class="nav-label">General</div>
+    <nav class="nav">
+      <a href="#" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+      <a href="#" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>Help &amp; Support</a>
+      <a href="#" data-auth="login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/></svg>Log In</a>
+      <a href="#" data-auth="signup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Sign Up</a>
+    </nav>
+    <div class="side-card"><b>Lumelle Pro</b><p>Advanced analytics, exports and team seats for your store.</p><button class="btn-light" onclick="document.querySelector('[data-view=analytics]').click()">View Analytics</button></div>
+    <div class="user-row"><div class="avatar" id="sideAvatar">N</div><div><b id="sideUserName">Noor Fatima</b><span id="sideUserRole">Store Owner</span></div><button title="Sign out" id="signOutBtn" aria-label="Sign out"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="globalSearch" type="search" placeholder="Search"><kbd>⌘ K</kbd></label>
+      <div class="top-actions">
+        <button class="icon-btn" title="Notifications" aria-label="Notifications"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i></i></button>
+        <button class="icon-btn" title="Messages" aria-label="Messages"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></button>
+        <button class="btn-primary" onclick="switchView('products')">+ Add Product</button>
+        <button class="icon-btn" id="topLoginBtn" title="Account" style="width:auto;padding:0 13px;font-size:12.5px;font-weight:500;gap:6px">Log In</button>
+        <div class="avatar" id="topAvatar" style="width:40px;height:40px;flex-basis:40px">N</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- ============ HOME / DASHBOARD ============ -->
+      <section class="view active" id="view-home">
+        <div class="greet-row">
+          <div><h1>Sunday, 8 November 2026</h1><p>Sales, orders and products at a glance.</p></div>
+          <div class="seg" id="rangeSeg"><button class="on">Today</button><button>7 Days</button><button>30 Days</button><button>12 Months</button></div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi hero"><label>Total revenue</label><div class="val">$5,918</div><small><span class="up">↑ 12.5%</span> · vs $5,261 yesterday · Payout in 2 days</small></div>
+          <div class="kpi"><label>New orders</label><div class="val">23</div><small><span class="up">↑ 8.2%</span> vs yesterday · 4 awaiting fulfilment</small></div>
+          <div class="kpi"><label>Store visitors</label><div class="val">1,842</div><small><span class="up">↑ 18.4%</span> vs last week · Peak 412 at 11am</small></div>
+          <div class="kpi"><label>Conversion rate</label><div class="val">1.25%</div><small><span class="down">↓ 0.18%</span> vs last week</small></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><div><h3>Revenue Overview</h3><p>Sales performance across all channels</p></div><span class="mono">Today</span></div>
+            <div class="chart-wrap">
+              <svg viewBox="0 0 640 240" role="img" aria-label="Line chart of revenue by channel through the week">
+                <g stroke="rgba(255,255,255,.05)"><line x1="0" y1="50" x2="640" y2="50"/><line x1="0" y1="100" x2="640" y2="100"/><line x1="0" y1="150" x2="640" y2="150"/><line x1="0" y1="200" x2="640" y2="200"/></g>
+                <path d="M0 190 C60 175,90 130,150 138 S250 185,310 150 S420 70,480 88 S590 55,640 38" fill="none" stroke="#e8c07a" stroke-width="2"/>
+                <path d="M0 205 C60 195,100 160,160 165 S260 200,320 178 S430 120,490 128 S595 100,640 82" fill="none" stroke="#9a958a" stroke-width="1.5"/>
+                <path d="M0 218 C70 210,110 188,170 192 S270 214,330 200 S440 160,500 166 S600 140,640 124" fill="none" stroke="#615c54" stroke-width="1.5"/>
+                <circle cx="480" cy="88" r="4" fill="#161513" stroke="#e8c07a" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="axis"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+            <div class="legend"><span><i style="background:#e8c07a"></i>Online Store</span><span><i style="background:#9a958a"></i>Marketplace</span><span><i style="background:#615c54"></i>Social Commerce</span></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div><h3>Top Products</h3><p>Best sellers today</p></div></div>
+            <div class="list-row"><div class="thumb">TP</div><div><b>TechPro Ultra Earbuds</b><span>Electronics · 8 sold</span></div><div class="r"><b>$1,520</b><br><span class="up" style="font-size:12px">↑ 24%</span></div></div>
+            <div class="list-row"><div class="thumb">LS</div><div><b>Lumelle Silk Serum</b><span>Skincare · 14 sold</span></div><div class="r"><b>$896</b><br><span class="up" style="font-size:12px">↑ 11%</span></div></div>
+            <div class="list-row"><div class="thumb">AM</div><div><b>Aurora Matte Lipstick</b><span>Beauty · 11 sold</span></div><div class="r"><b>$319</b><br><span class="up" style="font-size:12px">↑ 6%</span></div></div>
+            <div class="list-row"><div class="thumb">NW</div><div><b>Nova Smart Watch S2</b><span>Wearables · 3 sold</span></div><div class="r"><b>$747</b><br><span class="down" style="font-size:12px">↓ 3%</span></div></div>
+            <div style="margin-top:16px"><div class="bar-top" style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:500"><span>Monthly goal — $25,000</span><span style="color:var(--muted)">71%</span></div><div class="progress"><i class="gold" style="width:71%"></i></div></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:6px 0 0;overflow:hidden">
+          <div class="card-head" style="padding:14px 20px 4px"><div><h3>Recent Orders</h3><p>Latest purchases from your store</p></div><button class="text-btn" onclick="switchView('orders')">View all →</button></div>
+          <div class="table-wrap" style="border:0;border-radius:0">
+            <table><thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">#LM-9841</td><td>Ayesha Khan</td><td>TechPro Ultra Earbuds</td><td><b>$189.99</b></td><td><span class="pill green">Delivered</span></td></tr>
+              <tr><td class="mono">#LM-9840</td><td>Bilal Ahmed</td><td>Nova Smart Watch S2</td><td><b>$249.00</b></td><td><span class="pill blue">Shipped</span></td></tr>
+              <tr><td class="mono">#LM-9839</td><td>Sara Malik</td><td>Lumelle Silk Serum ×2</td><td><b>$128.00</b></td><td><span class="pill amber">Processing</span></td></tr>
+              <tr><td class="mono">#LM-9838</td><td>Hamza Tariq</td><td>Urban Runner Sneakers</td><td><b>$119.50</b></td><td><span class="pill green">Delivered</span></td></tr>
+              <tr><td class="mono">#LM-9837</td><td>Zainab Noor</td><td>Aurora Matte Lipstick Set</td><td><b>$87.00</b></td><td><span class="pill violet">Paid</span></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PRODUCTS ============ -->
+      <section class="view" id="view-products">
+        <div class="greet-row"><div><h1>Products</h1><p>248 products across 10 categories · Updated just now</p></div><button class="btn-primary" style="display:block">+ Add Product</button></div>
+
+        <div class="cat-grid" id="catGrid">
+          <button class="cat"><div class="tile">SF</div><b>Street Fashion</b><span>Clothing &amp; apparel</span><div class="cnt">48 products →</div></button>
+          <button class="cat"><div class="tile">FL</div><b>Floral Luxe</b><span>Dresses &amp; occasion</span><div class="cnt">36 products →</div></button>
+          <button class="cat"><div class="tile">SC</div><b>Skincare</b><span>Serums &amp; creams</span><div class="cnt">42 products →</div></button>
+          <button class="cat"><div class="tile">WR</div><b>Watches</b><span>Smart &amp; classic</span><div class="cnt">19 products →</div></button>
+          <button class="cat"><div class="tile">BT</div><b>Beauty Tools</b><span>Brushes &amp; devices</span><div class="cnt">27 products →</div></button>
+          <button class="cat"><div class="tile">AD</div><b>Accessories Deluxe</b><span>Bags &amp; belts</span><div class="cnt">31 products →</div></button>
+          <button class="cat"><div class="tile">NJ</div><b>New Jewelry</b><span>Gold &amp; silver</span><div class="cnt">22 products →</div></button>
+          <button class="cat"><div class="tile">GM</div><b>Grooming</b><span>Men's essentials</span><div class="cnt">15 products →</div></button>
+          <button class="cat"><div class="tile">SF</div><b>Shoes &amp; Footwear</b><span>Sneakers &amp; heels</span><div class="cnt">29 products →</div></button>
+          <button class="cat"><div class="tile">SP</div><b>Sport</b><span>Activewear</span><div class="cnt">18 products →</div></button>
+        </div>
+
+        <div class="toolbar"><h2>All Products</h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <label class="search" style="height:38px;max-width:260px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="prodSearch" type="search" placeholder="Filter products…"></label>
+            <div class="view-toggle"><button class="on" id="btnTable">☰ Table</button><button id="btnGrid">▦ Grid</button></div>
+          </div>
+        </div>
+
+        <div class="table-wrap" id="prodTableWrap">
+          <table id="prodTable"><thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Stock</th><th>Price</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><div class="prod-cell"><span class="thumb">TP</span>TechPro Ultra Wireless Earbuds</div></td><td class="mono">TPU-001</td><td>Electronics</td><td>142 in stock</td><td><b>$189.99</b></td><td><span class="pill green">Active</span></td></tr>
+            <tr><td><div class="prod-cell"><span class="thumb">LS</span>Lumelle Silk Face Serum 30ml</div></td><td class="mono">LSS-112</td><td>Skincare</td><td>86 in stock</td><td><b>$64.00</b></td><td><span class="pill green">Active</span></td></tr>
+            <tr><td><div class="prod-cell"><span class="thumb">NW</span>Nova Smart Watch Series 2</div></td><td class="mono">NSW-204</td><td>Watches</td><td>37 in stock</td><td><b>$249.00</b></td><td><span class="pill green">Active</span></td></tr>
+            <tr><td><div class="prod-cell"><span class="thumb">AM</span>Aurora Matte Lipstick — Rose</div></td><td class="mono">AML-078</td><td>Beauty</td><td>210 in stock</td><td><b>$29.00</b></td><td><span class="pill green">Active</span></td></tr>
+            <tr><td><div class="prod-cell"><span class="thumb">UR</span>Urban Runner Sneakers</div></td><td class="mono">URS-331</td><td>Shoes &amp; Footwear</td><td>12 in stock</td><td><b>$119.50</b></td><td><span class="pill amber">Low Stock</span></td></tr>
+            <tr><td><div class="prod-cell"><span class="thumb">VB</span>Velvet Tote Bag — Tan</div></td><td class="mono">VTB-045</td><td>Accessories Deluxe</td><td>54 in stock</td><td><b>$89.99</b></td><td><span class="pill green">Active</span></td></tr>
+            <tr><td><div class="prod-cell"><span class="thumb">GP</span>Gold Plated Pendant Necklace</div></td><td class="mono">GPN-019</td><td>New Jewelry</td><td>0 in stock</td><td><b>$149.00</b></td><td><span class="pill red">Out of Stock</span></td></tr>
+            <tr><td><div class="prod-cell"><span class="thumb">HF</span>HydraBoost Face Cream 50ml</div></td><td class="mono">HFC-096</td><td>Skincare</td><td>98 in stock</td><td><b>$42.50</b></td><td><span class="pill green">Active</span></td></tr>
+          </tbody></table>
+        </div>
+        <p id="noResults" style="display:none;color:var(--muted);font-size:13px;padding:14px 2px">No products match your filter.</p>
+        <div class="notice"><b>2 products need attention:</b> Urban Runner Sneakers are running low (12 left) and the Gold Plated Pendant Necklace is out of stock.</div>
+      </section>
+
+      <!-- ============ ANALYTICS ============ -->
+      <section class="view" id="view-analytics">
+        <div class="greet-row"><div><h1>Analytics</h1><p>Store performance · Last 12 months</p></div><div class="seg"><button>7D</button><button>30D</button><button class="on">12M</button></div></div>
+        <div class="kpis">
+          <div class="kpi hero"><label>Total revenue</label><div class="val">$280,257</div><small><span class="up">↑ 18.2%</span> · vs $237,120 last year</small></div>
+          <div class="kpi"><label>Total orders</label><div class="val">8,429</div><small><span class="up">↑ 12.7%</span> this year</small></div>
+          <div class="kpi"><label>Avg. order value</label><div class="val">$86.40</div><small><span class="up">↑ 4.9%</span> this year</small></div>
+          <div class="kpi"><label>Returning customers</label><div class="val">42%</div><small><span class="up">↑ 3.1%</span> loyalty growing</small></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><div><h3>Revenue Growth</h3><p>By channel · Jan – Dec</p></div><span class="mono">$280,257 total</span></div>
+            <div class="chart-wrap">
+              <svg viewBox="0 0 640 250" role="img" aria-label="Line chart of yearly revenue growth by channel">
+                <g stroke="rgba(255,255,255,.05)"><line x1="0" y1="55" x2="640" y2="55"/><line x1="0" y1="110" x2="640" y2="110"/><line x1="0" y1="165" x2="640" y2="165"/><line x1="0" y1="210" x2="640" y2="210"/></g>
+                <path d="M0 205 C55 195,85 178,130 168 S215 150,265 132 S360 108,410 88 S510 55,560 42 S615 28,640 20" fill="none" stroke="#e8c07a" stroke-width="2"/>
+                <path d="M0 218 C55 210,90 198,135 190 S220 175,270 162 S365 142,415 126 S515 100,562 88 S618 74,640 66" fill="none" stroke="#9a958a" stroke-width="1.5"/>
+                <path d="M0 230 C60 224,95 214,140 208 S225 196,275 188 S370 172,420 160 S518 138,565 128 S620 116,640 110" fill="none" stroke="#615c54" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="axis"><span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span><span>Dec</span></div>
+            <div class="legend"><span><i style="background:#e8c07a"></i>Online Store · $162,549</span><span><i style="background:#9a958a"></i>Marketplace · $73,911</span><span><i style="background:#615c54"></i>Social · $43,797</span></div>
+          </div>
+          <div class="card bars">
+            <div class="card-head"><div><h3>Sales by Channel</h3><p>Share of total revenue</p></div></div>
+            <div class="bar-row"><div class="bar-top">Online Store <span>58% · $162,549</span></div><div class="progress"><i style="width:58%;background:#aaa398"></i></div></div>
+            <div class="bar-row"><div class="bar-top">Marketplace <span>26% · $73,911</span></div><div class="progress"><i style="width:26%;background:#8a847a"></i></div></div>
+            <div class="bar-row"><div class="bar-top">Social Commerce <span>16% · $43,797</span></div><div class="progress"><i style="width:16%;background:#5f5a52"></i></div></div>
+            <div class="card-head" style="margin-top:22px"><div><h3>Top Regions</h3></div></div>
+            <div class="list-row"><div><b>Karachi</b><span>2,841 orders</span></div><div class="r"><b>$81,204</b></div></div>
+            <div class="list-row"><div><b>Lahore</b><span>2,102 orders</span></div><div class="r"><b>$59,870</b></div></div>
+            <div class="list-row"><div><b>Islamabad</b><span>1,476 orders</span></div><div class="r"><b>$44,112</b></div></div>
+            <div class="list-row"><div><b>Dubai (Intl.)</b><span>903 orders</span></div><div class="r"><b>$38,540</b></div></div>
+          </div>
+        </div>
+        <div class="grid-2" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="kpi"><label>Best Day</label><div class="val">14 Feb</div><small>$9,412 in a single day</small></div>
+          <div class="kpi"><label>Bounce Rate</label><div class="val">31.8%</div><small><span class="up">↓ 2.4% better</span> than last year</small></div>
+          <div class="kpi"><label>Avg. Session</label><div class="val">4m 12s</div><small><span class="up">↑ 38s</span> engagement up</small></div>
+        </div>
+      </section>
+
+      <!-- ============ ORDERS ============ -->
+      <section class="view" id="view-orders">
+        <div class="greet-row"><div><h1>Orders</h1><p>23 new orders today · 4 awaiting fulfilment</p></div><div class="seg"><button class="on">All</button><button>Pending</button><button>Shipped</button><button>Delivered</button></div></div>
+        <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi"><label>Pending</label><div class="val">4</div><small>Need packing today</small></div>
+          <div class="kpi"><label>Shipped</label><div class="val">11</div><small>On the way to customers</small></div>
+          <div class="kpi"><label>Delivered</label><div class="val">8</div><small>Completed today</small></div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>
+          <tr><td class="mono">#LM-9841</td><td>Ayesha Khan</td><td>TechPro Ultra Earbuds</td><td><b>$189.99</b></td><td><span class="pill green">Delivered</span></td></tr>
+          <tr><td class="mono">#LM-9840</td><td>Bilal Ahmed</td><td>Nova Smart Watch S2</td><td><b>$249.00</b></td><td><span class="pill blue">Shipped</span></td></tr>
+          <tr><td class="mono">#LM-9839</td><td>Sara Malik</td><td>Silk Serum ×2, Face Cream</td><td><b>$170.50</b></td><td><span class="pill amber">Processing</span></td></tr>
+          <tr><td class="mono">#LM-9838</td><td>Hamza Tariq</td><td>Urban Runner Sneakers</td><td><b>$119.50</b></td><td><span class="pill green">Delivered</span></td></tr>
+          <tr><td class="mono">#LM-9837</td><td>Zainab Noor</td><td>Lipstick Set, Beauty Tools</td><td><b>$87.00</b></td><td><span class="pill violet">Paid</span></td></tr>
+          <tr><td class="mono">#LM-9836</td><td>Usman Ali</td><td>Velvet Tote Bag</td><td><b>$89.99</b></td><td><span class="pill blue">Shipped</span></td></tr>
+        </tbody></table></div>
+      </section>
+
+      <!-- ============ CUSTOMERS ============ -->
+      <section class="view" id="view-customers">
+        <div class="greet-row"><div><h1>Customers</h1><p>3,214 total customers · 128 joined this month</p></div></div>
+        <div class="grid-2" style="grid-template-columns:1fr 1fr">
+          <div class="card"><div class="card-head"><div><h3>Top Customers</h3><p>By lifetime spend</p></div></div>
+            <div class="list-row"><div class="avatar">AK</div><div><b>Ayesha Khan</b><span>Karachi · 34 orders</span></div><div class="r"><b>$2,940</b></div></div>
+            <div class="list-row"><div class="avatar">SM</div><div><b>Sara Malik</b><span>Lahore · 27 orders</span></div><div class="r"><b>$2,310</b></div></div>
+            <div class="list-row"><div class="avatar">ZN</div><div><b>Zainab Noor</b><span>Islamabad · 21 orders</span></div><div class="r"><b>$1,875</b></div></div>
+            <div class="list-row"><div class="avatar">BA</div><div><b>Bilal Ahmed</b><span>Karachi · 18 orders</span></div><div class="r"><b>$1,540</b></div></div>
+          </div>
+          <div class="card bars"><div class="card-head"><div><h3>Customer Segments</h3><p>Share of customer base</p></div></div>
+            <div class="bar-row"><div class="bar-top">Repeat buyers <span>42%</span></div><div class="progress"><i style="width:42%;background:#aaa398"></i></div></div>
+            <div class="bar-row"><div class="bar-top">One-time buyers <span>37%</span></div><div class="progress"><i style="width:37%;background:#8a847a"></i></div></div>
+            <div class="bar-row"><div class="bar-top">VIP members <span>21%</span></div><div class="progress"><i style="width:21%;background:#5f5a52"></i></div></div>
+            <div class="notice">VIP customers spend <b>3.2× more</b> per order on average. Consider a loyalty reward for the 128 new customers who joined this month.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="note">Lumelle Store Admin · Dashboard, Products, Analytics, Log In &amp; Sign Up — figures shown are the store snapshot from the reference video.</footer>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <a href="#" class="active" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Home</a>
+  <a href="#" data-view="products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Products</a>
+  <a href="#" data-view="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>Orders</a>
+  <a href="#" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>Analytics</a>
+  <a href="#" data-view="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</a>
+  <a href="#" data-auth="login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>Account</a>
+</nav>
+
+<script>
+var pill=document.getElementById('navPill');
+function movePill(link,animate){
+  if(!link||!pill) return;
+  var top=link.offsetTop;
+  if(window.gsap&&animate){ gsap.to(pill,{y:top,duration:.4,ease:'expo.out'}); }
+  else if(window.gsap){ gsap.set(pill,{y:top}); } else { pill.style.transform='translateY('+top+'px)'; }
+}
+function switchView(name){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});
+  var el=document.getElementById('view-'+name); if(el) el.classList.add('active');
+  document.querySelectorAll('[data-view]').forEach(function(a){ if(a.dataset.view===name) a.classList.add('active'); else if(a.closest('#sideNav')||a.closest('.mobile-nav')) a.classList.remove('active'); });
+  var active=document.querySelector('#sideNav a[data-view="'+name+'"]');
+  movePill(active,true);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-view]').forEach(function(a){
+  a.addEventListener('click',function(e){e.preventDefault();switchView(a.dataset.view);});
+});
+window.addEventListener('load',function(){ var a=document.querySelector('#sideNav a.active'); movePill(a,false); });
+window.addEventListener('resize',function(){ var a=document.querySelector('#sideNav a.active'); movePill(a,false); });
+
+/* range segmented control (visual) */
+document.querySelectorAll('.seg').forEach(function(seg){
+  seg.querySelectorAll('button').forEach(function(b){ b.addEventListener('click',function(){ seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on')}); b.classList.add('on'); }); });
+});
+
+/* product filter */
+var ps=document.getElementById('prodSearch');
+function filterProducts(q){
+  q=(q||'').toLowerCase(); var any=false;
+  document.querySelectorAll('#prodTable tbody tr').forEach(function(tr){ var show=tr.textContent.toLowerCase().indexOf(q)>-1; tr.style.display=show?'':'none'; if(show)any=true; });
+  document.getElementById('noResults').style.display=any?'none':'block';
+}
+if(ps) ps.addEventListener('input',function(){filterProducts(ps.value)});
+var gs=document.getElementById('globalSearch');
+if(gs) gs.addEventListener('input',function(){ if(gs.value.trim()){ switchView('products'); var p=document.getElementById('prodSearch'); if(p){p.value=gs.value; filterProducts(gs.value);} } });
+
+/* products grid/table toggle */
+var btnT=document.getElementById('btnTable'), btnG=document.getElementById('btnGrid'), catGrid=document.getElementById('catGrid');
+if(btnG) btnG.addEventListener('click',function(){ btnG.classList.add('on'); btnT.classList.remove('on'); document.getElementById('prodTableWrap').style.display='none'; catGrid.scrollIntoView({behavior:'smooth',block:'start'}); });
+if(btnT) btnT.addEventListener('click',function(){ btnT.classList.add('on'); btnG.classList.remove('on'); document.getElementById('prodTableWrap').style.display=''; });
+document.querySelectorAll('.cat').forEach(function(c){ c.addEventListener('click',function(){ var p=document.getElementById('prodSearch'); var name=c.querySelector('b').textContent; if(p){ /* keep table visible */ document.getElementById('prodTableWrap').style.display=''; btnT.classList.add('on'); btnG.classList.remove('on'); } document.getElementById('prodTableWrap').scrollIntoView({behavior:'smooth',block:'center'}); }); });
+document.addEventListener('keydown',function(e){ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); if(gs) gs.focus(); }});
+
+/* ===== AUTH: LOGIN / SIGN UP (in-memory demo session, this tab only) ===== */
+var authScreen=document.getElementById('authScreen');
+var appShell=document.getElementById('appShell');
+var mobileNav=document.querySelector('.mobile-nav');
+var loginForm=document.getElementById('loginForm');
+var signupForm=document.getElementById('signupForm');
+var tabLogin=document.getElementById('tabLogin');
+var tabSignup=document.getElementById('tabSignup');
+var authMsg=document.getElementById('authMsg');
+var toastEl=document.getElementById('toast');
+var toastTimer=null;
+function showToast(msg){ if(!toastEl) return; toastEl.textContent=msg; toastEl.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){toastEl.classList.remove('show')},3400); }
+function setAuthMsg(type,text){ authMsg.className='auth-msg'+(type?' '+type:''); authMsg.textContent=text||''; }
+function setAuthMode(mode){
+  var isLogin=mode!=='signup';
+  loginForm.hidden=!isLogin; signupForm.hidden=isLogin;
+  tabLogin.classList.toggle('on',isLogin); tabSignup.classList.toggle('on',!isLogin);
+  setAuthMsg('','');
+}
+function showAuth(mode){
+  setAuthMode(mode||'login');
+  authScreen.hidden=false; appShell.style.display='none'; if(mobileNav) mobileNav.style.display='none';
+  document.title=(mode==='signup'?'Sign Up':'Log In')+' · Lumelle Dashboard';
+  window.scrollTo({top:0});
+  var first=authScreen.querySelector((mode==='signup'?'#suName':'#liEmail')); if(first) setTimeout(function(){first.focus()},60);
+}
+function hideAuth(){
+  authScreen.hidden=true; appShell.style.display=''; if(mobileNav) mobileNav.style.display='';
+  document.title='Lumelle Dashboard';
+}
+function initials(name){ return (name||'N').trim().split(/\s+/).map(function(w){return w[0]}).join('').slice(0,2).toUpperCase()||'N'; }
+function enterDashboard(name,email){
+  var display=(name||'Noor Fatima').trim();
+  var first=display.split(/\s+/)[0];
+  var sn=document.getElementById('sideUserName'); if(sn) sn.textContent=display;
+  var sr=document.getElementById('sideUserRole'); if(sr) sr.textContent=email||'Store Owner';
+  var ini=initials(display);
+  var sa=document.getElementById('sideAvatar'); if(sa) sa.textContent=ini;
+  var ta=document.getElementById('topAvatar'); if(ta) ta.textContent=ini;
+  var tl=document.getElementById('topLoginBtn'); if(tl) tl.textContent='Account ✓';
+  hideAuth(); switchView('home');
+}
+function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((v||'').trim()); }
+function markField(id,bad){ var f=document.getElementById(id); if(f) f.classList.toggle('invalid',!!bad); return !bad; }
+
+document.querySelectorAll('[data-auth]').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); showAuth(a.dataset.auth); }); });
+if(tabLogin) tabLogin.addEventListener('click',function(){setAuthMode('login')});
+if(tabSignup) tabSignup.addEventListener('click',function(){setAuthMode('signup')});
+document.querySelectorAll('[data-goto-signup]').forEach(function(b){ b.addEventListener('click',function(){setAuthMode('signup')}); });
+document.querySelectorAll('[data-goto-login]').forEach(function(b){ b.addEventListener('click',function(){setAuthMode('login')}); });
+var authBack=document.getElementById('authBack'); if(authBack) authBack.addEventListener('click',hideAuth);
+var signOutBtn=document.getElementById('signOutBtn'); if(signOutBtn) signOutBtn.addEventListener('click',function(){ showAuth('login'); showToast('Signed out — log in again to continue.'); });
+var topLoginBtn=document.getElementById('topLoginBtn'); if(topLoginBtn) topLoginBtn.addEventListener('click',function(){ showAuth('login'); });
+
+document.querySelectorAll('[data-eye]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var inp=document.getElementById(btn.dataset.eye); if(!inp) return;
+    var show=inp.type==='password'; inp.type=show?'text':'password'; btn.textContent=show?'Hide':'Show'; inp.focus();
+  });
+});
+var forgot=document.getElementById('forgotLink');
+if(forgot) forgot.addEventListener('click',function(e){
+  e.preventDefault();
+  var em=document.getElementById('liEmail').value;
+  if(!validEmail(em)){ markField('liEmailField',true); setAuthMsg('err','Enter your email above first, then tap Forgot password again.'); return; }
+  markField('liEmailField',false);
+  setAuthMsg('ok','Password reset link sent to '+em.trim()+' — check your inbox to set a new password.');
+});
+
+if(loginForm) loginForm.addEventListener('submit',function(e){
+  e.preventDefault();
+  var em=document.getElementById('liEmail').value;
+  var pw=document.getElementById('liPass').value;
+  var okEm=markField('liEmailField',!validEmail(em));
+  var okPw=markField('liPassField',pw.length<6);
+  if(!okEm||!okPw){ setAuthMsg('err','Please fix the highlighted fields and try again.'); return; }
+  setAuthMsg('','');
+  var name=em.trim().split('@')[0].replace(/[._-]+/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase()});
+  if(em.trim().toLowerCase()==='noor@lumelle.store') name='Noor Fatima';
+  enterDashboard(name,em.trim());
+  showToast('Welcome back, '+name.split(' ')[0]+'! You are logged in.');
+});
+
+/* signup password strength */
+var suPass=document.getElementById('suPass');
+if(suPass) suPass.addEventListener('input',function(){
+  var v=suPass.value; var score=0;
+  if(v.length>=8)score++; if(v.length>=12)score++; if(/[a-z]/.test(v)&&/[A-Z]/.test(v))score++; if(/\d/.test(v))score++; if(/[^A-Za-z0-9]/.test(v))score++;
+  var bar=document.getElementById('strengthBar'); var txt=document.getElementById('strengthTxt');
+  var pct=[0,20,40,60,80,100][score]; var col=score<=1?'#f87171':score<=3?'#fbbf24':'#34d399';
+  var label=score===0?'Use 8+ characters with a mix of letters and numbers.':score<=1?'Weak password':score<=3?'Good password':'Strong password';
+  if(bar){bar.style.width=pct+'%';bar.style.background=col;}
+  if(txt) txt.textContent=label+(v.length?' · '+v.length+' characters':'');
+});
+if(signupForm) signupForm.addEventListener('submit',function(e){
+  e.preventDefault();
+  var name=document.getElementById('suName').value;
+  var store=document.getElementById('suStore').value.trim();
+  var em=document.getElementById('suEmail').value;
+  var pw=document.getElementById('suPass').value;
+  var cf=document.getElementById('suConfirm').value;
+  var okName=markField('suNameField',name.trim().length<2);
+  var okEm=markField('suEmailField',!validEmail(em));
+  var okPw=markField('suPassField',pw.length<8);
+  var okCf=markField('suConfirmField',cf!==pw||!cf);
+  if(!okName||!okEm||!okPw||!okCf){ setAuthMsg('err','Please fix the highlighted fields and try again.'); return; }
+  setAuthMsg('','');
+  enterDashboard(name.trim(),em.trim());
+  showToast('Account created'+(store?' for '+store:'')+' — welcome to Lumelle, '+name.trim().split(' ')[0]+'!');
+});
+document.querySelectorAll('[data-social]').forEach(function(b){
+  b.addEventListener('click',function(){
+    enterDashboard('Noor Fatima','noor@lumelle.store');
+    showToast('Signed in with '+b.dataset.social+' — welcome back!');
+  });
+});
+['liEmail','liPass','suName','suEmail','suPass','suConfirm'].forEach(function(id){
+  var el=document.getElementById(id); if(el) el.addEventListener('input',function(){ var f=el.closest('.field'); if(f) f.classList.remove('invalid'); });
+});
+</script>
+</body>
+</html>
